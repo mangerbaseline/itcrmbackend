@@ -17,7 +17,11 @@ const PORT = process.env.PORT || 5001;
 const JWT_SECRET = process.env.JWT_SECRET || 'it-crm-secret-key';
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/it-crm';
 
-app.use(cors());
+app.use(cors({
+  origin: ['https://itcrmfrontend.vercel.app', 'http://localhost:3005'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json({ limit: '10mb' }));
 
 // ==========================================
@@ -816,13 +820,13 @@ app.put('/api/leaves/:id/approve', authMiddleware, roleMiddleware('owner', 'hr',
     }
     const leave = await Leave.findById(req.params.id);
     if (!leave) return res.json({ success: false, message: 'Leave request not found' });
-    
+
     leave.status = status;
     leave.approvedBy = req.user._id;
     leave.approvedByName = req.user.name;
     leave.approvedByRole = req.user.role;
     await leave.save();
-    
+
     res.json({ success: true, leave });
   } catch (e) {
     res.json({ success: false, message: e.message });
@@ -1172,7 +1176,7 @@ app.get('/api/reports/all', authMiddleware, roleMiddleware('owner', 'hr'), async
 // ==========================================
 async function seedUsers() {
   console.log('Seeding default and requested users...');
-  
+
   // Base default users
   const defaultUsers = [
     { name: 'Company Owner', email: 'owner@company.com', password: 'owner123', role: 'owner' },
@@ -1189,18 +1193,18 @@ async function seedUsers() {
     { name: 'Latif', email: 'latif@company.com', password: '123456', role: 'sales' },
     { name: 'Rohit', email: 'rohit@company.com', password: '123456', role: 'sales' },
     { name: 'Pawan', email: 'pawan@company.com', password: '123456', role: 'sales' },
-    
+
     // bdm - Prashant , arif
     { name: 'Prashant', email: 'prashant@company.com', password: '123456', role: 'bdm' },
     { name: 'Arif', email: 'arif@company.com', password: '123456', role: 'bdm' },
-    
+
     // pm - harmeet, Gagandeep , raman , sumitrana , sahilthakur
     { name: 'Harmeet', email: 'harmeet@company.com', password: '123456', role: 'pm' },
     { name: 'Gagandeep', email: 'gagandeep@company.com', password: '123456', role: 'pm' },
     { name: 'Raman', email: 'raman@company.com', password: '123456', role: 'pm' },
     { name: 'Sumitrana', email: 'sumitrana@company.com', password: '123456', role: 'pm' },
     { name: 'Sahil Thakur', email: 'sahilthakur@company.com', password: '123456', role: 'pm' },
-    
+
     // dev- Gaurav , Ishan ,ajesh , sachin , vishwash , divyanshu
     { name: 'Gaurav', email: 'gaurav@company.com', password: '123456', role: 'dev' },
     { name: 'Ishan', email: 'ishan@company.com', password: '123456', role: 'dev' },
@@ -1208,7 +1212,7 @@ async function seedUsers() {
     { name: 'Sachin', email: 'sachin@company.com', password: '123456', role: 'dev' },
     { name: 'Vishwash', email: 'vishwash@company.com', password: '123456', role: 'dev' },
     { name: 'Divyanshu', email: 'divyanshu@company.com', password: '123456', role: 'dev' },
-    
+
     // hr - Rahul , danish
     { name: 'Rahul', email: 'rahul@company.com', password: '123456', role: 'hr' },
     { name: 'Danish', email: 'danish@company.com', password: '123456', role: 'hr' }
